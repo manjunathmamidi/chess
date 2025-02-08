@@ -34,22 +34,30 @@ def move_to_row_col(move):
 def home():
     return "Stockfish Chess Engine is Running!"
 
-# Best Move API
 @app.route('/get_best_move', methods=['POST'])
 def get_best_move():
-    data = request.json
-    if 'turn' not in data or data['turn'] not in ['W', 'B']:
-        return jsonify({'error': 'Invalid input, send "W" for White or "B" for Black'}), 400
+    try:
+        data = request.get_json()
+        if not data or 'turn' not in data:
+            return jsonify({'error': 'Invalid input, send {"turn": "W"} or {"turn": "B"}'}), 400
 
-    if (data['turn'] == 'W' and board.turn == chess.WHITE) or (data['turn'] == 'B' and board.turn == chess.BLACK):
-        result = engine.play(board, chess.engine.Limit(time=2.0))
-        best_move = result.move.uci()
-        board.push(result.move)
-        start_r, start_c, end_r, end_c = move_to_row_col(best_move)
+        if data['turn'] not in ['W', 'B']:
+            return jsonify({'error': 'Invalid turn value'}), 400
+        
+        # Ensure AI's turn before moving
+        if (data['turn'] == 'W' and board.turn == chess.BLACK) or (data['turn'] == 'B' and board.turn == chess.WHITE):
+            result = engine.play(board, chess.engine.Limit(time=2.0))
+            best_move = result.move.uci()
+            board.push(result.move)
 
-        return jsonify({'start_row': start_r, 'start_col': start_c, 'end_row': end_r, 'end_col': end_c})
+            start_r, start_c, end_r, end_c = move_to_row_col(best_move)
+            return jsonify({'start_row': start_r, 'start_col': start_c, 'end_row': end_r, 'end_col': end_c})
 
-    return jsonify({'message': "Not AI's turn"}), 200
+        return jsonify({'message': "Not AI's turn"}), 200
+
+    except Exception as e:
+        print("Error:", str(e))
+        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
 
 # Close Stockfish
 @app.route('/close_engine', methods=['GET'])
