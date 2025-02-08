@@ -8,7 +8,7 @@ from flask_cors import CORS
 app = Flask(__name__, static_folder=".", static_url_path="/")
 CORS(app)
 
-STOCKFISH_PATH = "/opt/render/project/src/stockfish"
+STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
 
 # Ensure Stockfish is executable
 if not os.access(STOCKFISH_PATH, os.X_OK):
