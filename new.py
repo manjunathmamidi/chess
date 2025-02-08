@@ -1,24 +1,24 @@
 import os
 import stat
-from flask import Flask, jsonify, request
 import chess
 import chess.engine
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".")
 CORS(app)
 
-# Set correct path for Stockfish
+# Path to Stockfish binary (Ensure it's in the correct location)
 STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
 
-# Grant execution permission to Stockfish
+# Ensure Stockfish has execute permissions
 os.chmod(STOCKFISH_PATH, os.stat(STOCKFISH_PATH).st_mode | stat.S_IEXEC)
 
 # Initialize Stockfish engine
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
 board = chess.Board()
 
-# Convert move to row & column format
+# Convert move to row & column
 def move_to_row_col(move):
     start_square, end_square = move[:2], move[2:]
 
@@ -27,39 +27,40 @@ def move_to_row_col(move):
 
     return (*chess_notation_to_indices(start_square), *chess_notation_to_indices(end_square))
 
-# Home route
+# ✅ Serve `index.html` (Frontend)
 @app.route("/")
-def home():
-    return "Stockfish Chess Engine is Running!"
+def serve_index():
+    return send_from_directory(".", "index.html")
 
-# Get best move from Stockfish (Now AI always plays)
+# ✅ Serve static files like `p3.css` & `p3.js`
+@app.route("/<path:filename>")
+def serve_static_files(filename):
+    return send_from_directory(".", filename)
+
+# ✅ AI Move Endpoint
 @app.route('/get_best_move', methods=['POST'])
 def get_best_move():
-    try:
-        data = request.get_json()
-        if not data or 'turn' not in data:
-            return jsonify({'error': 'Invalid input, send {"turn": "W"} or {"turn": "B"}'}), 400
+    data = request.json
+    if 'turn' not in data or data['turn'] not in ['W', 'B']:
+        return jsonify({'error': 'Invalid input, send "W" for White or "B" for Black'}), 400
 
-        # Generate best move
+    if (data['turn'] == 'W' and board.turn == chess.BLACK) or (data['turn'] == 'B' and board.turn == chess.WHITE):
         result = engine.play(board, chess.engine.Limit(time=2.0))
         best_move = result.move.uci()
         board.push(result.move)
-
-        # Convert move to frontend format
         start_r, start_c, end_r, end_c = move_to_row_col(best_move)
+
         return jsonify({'start_row': start_r, 'start_col': start_c, 'end_row': end_r, 'end_col': end_c})
 
-    except Exception as e:
-        print("Error:", str(e))
-        return jsonify({'error': 'Internal Server Error', 'message': str(e)}), 500
+    return jsonify({'message': "Not AI's turn"}), 200
 
-# Close Stockfish engine route
+# ✅ Route to Close Stockfish Engine
 @app.route('/close_engine', methods=['GET'])
 def close_engine():
     engine.quit()
     return "Engine Closed"
 
-# Run Flask app
+# ✅ Run Flask App
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
