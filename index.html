@@ -2,9 +2,10 @@
 <html>
 <head>
     <title>Chess</title>
-    <link rel="stylesheet" href="p3.css">
-    <script src="p3.js"></script>
+    <link rel="stylesheet" href="/p3.css">  <!-- Ensure it loads from root -->
+    <script src="/p3.js" defer></script>  <!-- Use "defer" to prevent issues -->
 </head>
+
 <body>
     <button onclick="myfunc()">Generate Table</button><br><br>
     <table id="a"></table>
