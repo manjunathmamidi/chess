@@ -1,0 +1,9 @@
+{
+  "name": "chess",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "stockfish.js": "^10.0.2"
+  }
+}
