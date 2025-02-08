@@ -2,19 +2,19 @@
 <html>
 <head>
     <title>Chess</title>
-    <link rel="stylesheet" href="/p3.css">  <!-- Ensure it loads from root -->
-    <script src="/p3.js" defer></script>  <!-- Use "defer" to prevent issues -->
+    <link rel="stylesheet" href="/p3.css">
+    <script src="/p3.js" defer></script>
 </head>
 
 <body>
     <button onclick="myfunc()">Generate Table</button><br><br>
     <table id="a"></table>
     <div>
-        <br><button id="z" onclick="bestmove(event)" val="W">BLACK MOVE</button><br><br>
+        <br><button id="z" onclick="bestmove(event)" data-val="W">BLACK MOVE</button><br><br>
     </div>
     <div>
-        <button id="y" onclick="bestmove(event)" val="B">WHITE MOVE</button>
+        <button id="y" onclick="bestmove(event)" data-val="B">WHITE MOVE</button>
     </div>
-    <p id="k"> </p>
+    <p id="k"></p>
 </body>
 </html>
