@@ -3,7 +3,7 @@ from flask import Flask, jsonify, request
 import chess
 import chess.engine
 from flask_cors import CORS
-
+import stat
 app = Flask(__name__)
 CORS(app)
 STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
