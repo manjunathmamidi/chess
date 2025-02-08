@@ -6,27 +6,10 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
+STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
 
-# List of possible Stockfish paths
-STOCKFISH_PATHS = [
-    os.environ.get("STOCKFISH_PATH", ""),  # Render environment variable
-    "/opt/render/project/src/stockfish/stockfish-windows-x86-64-avx2.exe",
-    "/opt/render/project/src/stockfish/stockfish-linux-x86-64-avx2",
-    "./stockfish-windows-x86-64-avx2.exe",
-    "./stockfish-linux-x86-64-avx2",
-]
-
-# Find a valid Stockfish path
-def find_stockfish():
-    for path in STOCKFISH_PATHS:
-        if path and os.path.exists(path) and os.access(path, os.X_OK):
-            return path
-    raise FileNotFoundError("Stockfish not found in any of the expected locations.")
-
-# Get correct Stockfish path
-STOCKFISH_PATH = find_stockfish()
-
-# Initialize Stockfish engine
+if not os.path.exists(STOCKFISH_PATH):
+    raise FileNotFoundError(f"Stockfish binary not found at {STOCKFISH_PATH}")
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
 board = chess.Board()
 
