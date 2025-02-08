@@ -25,6 +25,9 @@ def move_to_row_col(move):
     return (*chess_notation_to_indices(start_square), *chess_notation_to_indices(end_square))
 
 # Route to get the best move
+@app.route("/")
+def home():
+    return "Stockfish Chess Engine is Running!"
 @app.route('/get_best_move', methods=['POST'])
 def get_best_move():
     data = request.json
