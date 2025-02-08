@@ -185,8 +185,9 @@ function movePiece(row, col, targetCell) {
     }
 }
 
-function bestmove() {
+function bestmove(event) {
     let turn = event.target.getAttribute("val");
+    console.log("Button Clicked, Turn:", turn);  // Debugging line
 
     fetch("https://chess-lgwl.onrender.com/get_best_move", {
         method: "POST",
@@ -197,6 +198,8 @@ function bestmove() {
     })
     .then(response => response.json())
     .then(data => {
+        console.log("Response Data:", data); // Debugging response
+
         if (data.error) {
             console.error("Error:", data.error);
             return;
@@ -206,8 +209,9 @@ function bestmove() {
         let startCol = data.start_col - 1;
         let endRow = data.end_row - 1;
         let endCol = data.end_col - 1;
+        
         document.getElementById('k').innerText=`${String.fromCharCode(97 + startCol)}${8 - startRow} to ${String.fromCharCode(97 + endCol)}${8 - endRow}`;
-
+        
         movePiece(startRow, startCol, document.getElementById("a").rows[endRow].cells[endCol]);
     })
     .catch(error => console.error("Error:", error));
