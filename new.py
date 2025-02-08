@@ -8,8 +8,10 @@ app = Flask(__name__)
 CORS(app)
 STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
 
-if not os.path.exists(STOCKFISH_PATH):
-    raise FileNotFoundError(f"Stockfish binary not found at {STOCKFISH_PATH}")
+# Force setting execute permission
+os.chmod(STOCKFISH_PATH, os.stat(STOCKFISH_PATH).st_mode | stat.S_IEXEC)
+
+print("Stockfish is now executable:", os.access(STOCKFISH_PATH, os.X_OK))
 engine = chess.engine.SimpleEngine.popen_uci(STOCKFISH_PATH)
 board = chess.Board()
 
