@@ -2,13 +2,13 @@ import os
 import chess
 import chess.engine
 import stat
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=".", static_url_path="/")
 CORS(app)
 
-STOCKFISH_PATH = "/opt/render/project/src/Stock_fish"
+STOCKFISH_PATH = "/opt/render/project/src/stockfish"
 
 # Ensure Stockfish is executable
 if not os.access(STOCKFISH_PATH, os.X_OK):
@@ -26,9 +26,15 @@ except Exception as e:
 
 board = chess.Board()
 
+# Serve Frontend (index.html)
 @app.route("/")
-def home():
-    return "Stockfish Chess Engine is Running!"
+def serve_frontend():
+    return send_from_directory(".", "index.html")
+
+# Serve static assets (CSS, JS, Images)
+@app.route("/<path:path>")
+def serve_static(path):
+    return send_from_directory(".", path)
 
 @app.route('/get_best_move', methods=['POST'])
 def get_best_move():
@@ -39,7 +45,7 @@ def get_best_move():
 
     try:
         if (data['turn'] == 'W' and board.turn == chess.WHITE) or (data['turn'] == 'B' and board.turn == chess.BLACK):
-            result = engine.play(board, chess.engine.Limit(time=0.05, depth=3))  # Reduce time & depth
+            result = engine.play(board, chess.engine.Limit(time=0.1, depth=5))
             best_move = result.move.uci()
             board.push(result.move)
 
