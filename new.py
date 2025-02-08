@@ -45,7 +45,7 @@ def get_best_move():
         return jsonify({'error': 'Invalid input, send "W" for White or "B" for Black'}), 400
 
     if (data['turn'] == 'W' and board.turn == chess.BLACK) or (data['turn'] == 'B' and board.turn == chess.WHITE):
-        result = engine.play(board, chess.engine.Limit(time=2.0))
+        result = engine.play(board, chess.engine.Limit(time=0.1, depth=4))
         best_move = result.move.uci()
         board.push(result.move)
         start_r, start_c, end_r, end_c = move_to_row_col(best_move)
